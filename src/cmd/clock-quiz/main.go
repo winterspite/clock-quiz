@@ -16,11 +16,9 @@ func main() {
 	w.ShowAndRun()
 }
 
-func Show(win fyne.Window) fyne.CanvasObject {
+func Show(_ fyne.Window) fyne.CanvasObject {
 	clock := &model.ClockLayout{}
-
 	content := clock.Render()
-
 	listener := make(chan fyne.Settings)
 
 	fyne.CurrentApp().Settings().AddChangeListener(listener)
