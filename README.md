@@ -8,3 +8,4 @@
 - scoreboard
 - refresh / new challenge feature
 - fix times again so we don't wrap over the day
+- allow 12 when time is 00

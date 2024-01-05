@@ -21,6 +21,7 @@ var (
 )
 
 type Challenge struct {
+	Quiz *Quiz
 	widget.BaseWidget
 	Clock1      fyne.CanvasObject
 	Clock1Time  time.Time
@@ -127,21 +128,44 @@ func (c *Challenge) Check() {
 	}
 }
 
+const (
+	ScoreCorrect   = "Correct"
+	ScoreIncorrect = "Incorrect"
+	ScoreInvalid   = "Invalid"
+)
+
+func (c *Challenge) UpdateScore(score string) {
+	switch score {
+	case ScoreCorrect:
+		c.Quiz.Scoreboard.Correct++
+	case ScoreIncorrect:
+		c.Quiz.Scoreboard.Incorrect++
+	case ScoreInvalid:
+		c.Quiz.Scoreboard.Invalid++
+	}
+
+	c.Quiz.Scoreboard.UpdateScore()
+}
+
 func (c *Challenge) InternalCheck() error {
 	var err error
 
 	c.Clock1Guess, err = parseInputTime(c.Clock1Input.Text)
 	if err != nil {
+		c.UpdateScore(ScoreInvalid)
+
 		return err
 	}
 
 	c.Clock2Guess, err = parseInputTime(c.Clock2Input.Text)
 	if err != nil {
+		c.UpdateScore(ScoreInvalid)
 		return err
 	}
 
 	c.DifferenceGuess, err = parseInputDuration(c.DifferenceInput.Text)
 	if err != nil {
+		c.UpdateScore(ScoreInvalid)
 		return err
 	}
 
@@ -149,22 +173,30 @@ func (c *Challenge) InternalCheck() error {
 	c.Clock2Guess = fixupClockTime(c.Clock2Guess, c.Clock2Time)
 
 	if c.Clock1Time != c.Clock1Guess {
+		c.UpdateScore(ScoreIncorrect)
 		return ErrInvalidClock1Time
 	}
 
 	if c.Clock2Time != c.Clock2Guess {
+		c.UpdateScore(ScoreIncorrect)
 		return ErrInvalidClock2Time
 	}
 
 	if c.DifferenceGuess != c.Difference {
 		if c.Difference > (time.Hour * 12) { // 24hr check
 			if c.DifferenceGuess == (c.Difference - (time.Hour * 12)) {
+				c.UpdateScore(ScoreCorrect)
+
 				return nil
 			}
 		}
 
+		c.UpdateScore(ScoreIncorrect)
+
 		return ErrInvalidDifference
 	}
+
+	c.UpdateScore(ScoreCorrect)
 
 	return nil
 }

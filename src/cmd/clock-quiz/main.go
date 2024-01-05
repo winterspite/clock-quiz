@@ -12,13 +12,14 @@ func main() {
 
 	w := a.NewWindow("Clock Quiz")
 
-	quiz := model.NewChallenge(w)
+	quiz := model.NewQuiz(w)
 
 	content := container.New(
 		layout.NewFormLayout(),
-		quiz.Clock1, quiz.Clock2,
-		quiz.Clock1Input, quiz.Clock2Input,
-		quiz.DifferenceInput, quiz.SubmitButton,
+		quiz.Challenge.Clock1, quiz.Challenge.Clock2,
+		quiz.Challenge.Clock1Input, quiz.Challenge.Clock2Input,
+		quiz.Challenge.DifferenceInput, quiz.Challenge.SubmitButton,
+		quiz.Scoreboard.Label, quiz.Scoreboard.Label,
 	)
 
 	w.SetContent(content)
