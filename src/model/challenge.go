@@ -21,19 +21,22 @@ var (
 type Challenge struct {
 	Quiz *Quiz
 	widget.BaseWidget
-	Clock1      fyne.CanvasObject
-	Clock1Time  time.Time
-	Clock1Input *widget.Entry
-	Clock1Guess time.Time
+	Clock1            fyne.CanvasObject
+	Clock1Time        time.Time
+	Clock1Input       *widget.Entry
+	Clock1InputString string
+	Clock1Guess       time.Time
 
-	Clock2      fyne.CanvasObject
-	Clock2Time  time.Time
-	Clock2Input *widget.Entry
-	Clock2Guess time.Time
+	Clock2            fyne.CanvasObject
+	Clock2Time        time.Time
+	Clock2Input       *widget.Entry
+	Clock2InputString string
+	Clock2Guess       time.Time
 
-	DifferenceInput *widget.Entry
-	DifferenceGuess time.Duration
-	Difference      time.Duration
+	DifferenceInput       *widget.Entry
+	DifferenceInputString string
+	DifferenceGuess       time.Duration
+	Difference            time.Duration
 
 	SubmitButton *widget.Button
 	Window       fyne.Window
@@ -78,6 +81,7 @@ func newRandomTimes() (int, int, int, int) {
 		int(t2Hour.Int64()), int(t2Min.Int64())
 }
 
+// New creates a new challenge and sets all the internal variables.
 func (c *Challenge) New(time1, time2 time.Time) {
 	c.Clock1Time = time1
 	c.Clock1 = CreateClock(time1)
@@ -104,6 +108,7 @@ func (c *Challenge) New(time1, time2 time.Time) {
 		time2.Sub(time1))
 }
 
+// CreateClock creates a fyne canvas object representing a clock set to the time passed in.
 func CreateClock(clockTime time.Time) fyne.CanvasObject {
 	clock := &ClockLayout{
 		Time: clockTime,
@@ -124,6 +129,14 @@ func CreateClock(clockTime time.Time) fyne.CanvasObject {
 	return content
 }
 
+// SyncInputFields syncs the Fyne widget fields into in-struct text fields for better testing.
+func (c *Challenge) SyncInputFields() {
+	c.Clock1InputString = c.Clock1Input.Text
+	c.Clock2InputString = c.Clock2Input.Text
+	c.DifferenceInputString = c.DifferenceInput.Text
+}
+
+// Check is the button-press function for checking a challenge.
 func (c *Challenge) Check() {
 	log.Printf("Check: t1: %s, t2: %s, diff: %s",
 		c.Clock1Input.Text,
@@ -131,7 +144,12 @@ func (c *Challenge) Check() {
 		c.DifferenceInput.Text,
 	)
 
-	err := c.InternalCheck()
+	c.SyncInputFields()
+
+	score, err := c.InternalCheck()
+
+	c.UpdateScore(score)
+
 	if err != nil {
 		dialog.ShowError(err, c.Window)
 	} else {
@@ -141,13 +159,16 @@ func (c *Challenge) Check() {
 	}
 }
 
+type Score string
+
 const (
-	ScoreCorrect   = "Correct"
-	ScoreIncorrect = "Incorrect"
-	ScoreInvalid   = "Invalid"
+	ScoreCorrect   Score = "Correct"
+	ScoreIncorrect Score = "Incorrect"
+	ScoreInvalid   Score = "Invalid"
 )
 
-func (c *Challenge) UpdateScore(score string) {
+// UpdateScore updates the associated score for our challenge.
+func (c *Challenge) UpdateScore(score Score) {
 	switch score {
 	case ScoreCorrect:
 		c.Quiz.Scoreboard.Correct++
@@ -160,66 +181,45 @@ func (c *Challenge) UpdateScore(score string) {
 	c.Quiz.Scoreboard.UpdateScore()
 }
 
-func (c *Challenge) InternalCheck() error {
+// InternalCheck does the main score comparison loop.
+func (c *Challenge) InternalCheck() (Score, error) {
 	var err error
 
-	c.Clock1Guess, err = parseInputTime(c.Clock1Input.Text)
+	c.Clock1Guess, err = parseInputTime(c.Clock1InputString)
 	if err != nil {
-		c.UpdateScore(ScoreInvalid)
-
-		return err
+		return ScoreInvalid, err
 	}
 
-	c.Clock2Guess, err = parseInputTime(c.Clock2Input.Text)
+	c.Clock2Guess, err = parseInputTime(c.Clock2InputString)
 	if err != nil {
-		c.UpdateScore(ScoreInvalid)
-		return err
+		return ScoreInvalid, err
 	}
 
-	c.DifferenceGuess, err = parseInputDuration(c.DifferenceInput.Text)
+	c.DifferenceGuess, err = parseInputDuration(c.DifferenceInputString)
 	if err != nil {
-		c.UpdateScore(ScoreInvalid)
-		return err
+		return ScoreInvalid, err
 	}
 
 	c.Clock1Guess = fixupClockTime(c.Clock1Guess, c.Clock1Time)
 	c.Clock2Guess = fixupClockTime(c.Clock2Guess, c.Clock2Time)
 
 	if c.Clock1Time != c.Clock1Guess {
-		c.UpdateScore(ScoreIncorrect)
-		return ErrInvalidClock1Time
+		return ScoreIncorrect, ErrInvalidClock1Time
 	}
 
 	if c.Clock2Time != c.Clock2Guess {
-		c.UpdateScore(ScoreIncorrect)
-		return ErrInvalidClock2Time
+		return ScoreIncorrect, ErrInvalidClock2Time
 	}
 
 	if c.DifferenceGuess != c.Difference {
 		if c.Difference > (time.Hour * 12) { // 24hr check
 			if c.DifferenceGuess == (c.Difference - (time.Hour * 12)) {
-				c.UpdateScore(ScoreCorrect)
-
-				return nil
+				return ScoreCorrect, nil
 			}
 		}
 
-		c.UpdateScore(ScoreIncorrect)
-
-		return ErrInvalidDifference
+		return ScoreIncorrect, ErrInvalidDifference
 	}
 
-	c.UpdateScore(ScoreCorrect)
-
-	return nil
-}
-
-func fixupClockTime(guess, actual time.Time) time.Time {
-	if guess == actual {
-		return guess
-	} else if guess.Add(time.Hour*12) == actual {
-		return actual
-	}
-
-	return guess
+	return ScoreCorrect, nil
 }

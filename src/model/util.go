@@ -12,6 +12,7 @@ var (
 	ErrInvalidTime = errors.New("invalid time format, try hh:mm")
 )
 
+// parseInputTime parses the input string and returns a Golang duration object or error.
 func parseInputDuration(input string) (time.Duration, error) {
 	if !timeRegex.MatchString(input) {
 		return 0, ErrInvalidTime
@@ -39,6 +40,7 @@ func parseInputDuration(input string) (time.Duration, error) {
 	return d, nil
 }
 
+// parseInputTime parses the input string and returns a Golang time object or error.
 func parseInputTime(input string) (time.Time, error) {
 	t := time.Time{}
 
@@ -67,4 +69,15 @@ func parseInputTime(input string) (time.Time, error) {
 	t = t.Add(time.Minute * time.Duration(minInt))
 
 	return t, nil
+}
+
+// fixupClockTime helps to ensure that 13 and 1 are treated the same to make it easier on guesser.
+func fixupClockTime(guess, actual time.Time) time.Time {
+	if guess == actual {
+		return guess
+	} else if guess.Add(time.Hour*12) == actual {
+		return actual
+	}
+
+	return guess
 }
