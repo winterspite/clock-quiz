@@ -2,6 +2,8 @@ package model
 
 import (
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -30,15 +32,25 @@ func NewQuiz(w fyne.Window) Quiz {
 func (q *Quiz) NewChallenge() {
 	q.Challenge = NewChallenge(q.Window)
 
-	q.Challenge.DifferenceInput.Text = "Enter difference"
+	q.Challenge.DifferenceInput.Text = ""
 	q.Challenge.DifferenceInput.Refresh()
 
-	q.Challenge.Clock1Input.Text = "Enter Time"
+	q.Challenge.Clock1Input.Text = ""
 	q.Challenge.Clock1Input.Refresh()
 	q.Challenge.Clock1.Refresh()
-	q.Challenge.Clock2Input.Text = "Enter Time"
+	q.Challenge.Clock2Input.Text = ""
 	q.Challenge.Clock2Input.Refresh()
 	q.Challenge.Clock2.Refresh()
 
 	q.Challenge.Quiz = q
+
+	content := container.New(
+		layout.NewFormLayout(),
+		q.Challenge.Clock1, q.Challenge.Clock2,
+		q.Challenge.Clock1Input, q.Challenge.Clock2Input,
+		q.Challenge.DifferenceInput, q.Challenge.SubmitButton,
+		q.NewChallengeButton, q.Scoreboard.Label,
+	)
+
+	q.Window.SetContent(content)
 }

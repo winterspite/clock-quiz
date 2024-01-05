@@ -6,9 +6,6 @@ in hours and minutes between two analog clocks.
 ## To Do List
 
 - fix layout to look nicer
-- scoreboard
-- refresh / new challenge feature
-    - clocks don't update
  
 ## Fix macOS quarantine?
 

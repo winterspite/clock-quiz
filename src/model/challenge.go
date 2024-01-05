@@ -212,8 +212,6 @@ func fixupClockTime(guess, actual time.Time) time.Time {
 		return guess
 	} else if guess.Add(time.Hour*12) == actual {
 		return actual
-	} else if guess.Add(time.Hour*-12) == actual {
-		return actual
 	}
 
 	return guess
