@@ -70,6 +70,7 @@ func fixupTimes(t1, t2 time.Time) (time.Time, time.Time) {
 	return t1, t2
 }
 
+// newRandomTimes generates some random hour and minute values.
 func newRandomTimes() (int, int, int, int) {
 	t1Hour, _ := rand.Int(rand.Reader, big.NewInt(25)) // gets a random integer between 0 and 24
 	t2Hour, _ := rand.Int(rand.Reader, big.NewInt(25)) // gets a random integer between 0 and 24
@@ -163,6 +164,7 @@ func (c *Challenge) Check() {
 	}
 }
 
+// getDialogContents returns a specific dialog box with the challenge input values.
 func (c *Challenge) getDialogContents(score Score, err error) *fyne.Container {
 	c1Label := widget.NewLabel("Clock 1 Guess")
 	c1Text := widget.NewLabel(c.Clock1InputString)
