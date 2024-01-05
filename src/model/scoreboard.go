@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"log"
 
 	"fyne.io/fyne/v2/widget"
 )
@@ -14,9 +15,12 @@ type Scoreboard struct {
 }
 
 func (s *Scoreboard) UpdateScore() {
-	s.Label.Text = fmt.Sprintf("Correct: %02d, Incorrect: %02d, Invalid: %02d",
+	score := fmt.Sprintf("Correct: %02d, Incorrect: %02d, Invalid: %02d",
 		s.Correct, s.Incorrect, s.Invalid)
 
+	log.Println(score)
+
+	s.Label.Text = score
 	s.Label.Refresh()
 }
 

@@ -100,7 +100,10 @@ func (c *Challenge) New(time1, time2 time.Time) {
 
 	c.SubmitButton = widget.NewButton("Check", c.Check)
 
-	log.Printf("T1: %v, T2: %v, Diff: %v", time1, time2, time2.Sub(time1))
+	log.Printf("T1: %02d:%02d, T2: %02d:%02d, Diff: %v",
+		time1.Hour(), time1.Minute(),
+		time2.Hour(), time2.Minute(),
+		time2.Sub(time1))
 }
 
 func CreateClock(clockTime time.Time) fyne.CanvasObject {
@@ -124,6 +127,12 @@ func CreateClock(clockTime time.Time) fyne.CanvasObject {
 }
 
 func (c *Challenge) Check() {
+	log.Printf("Check: t1: %s, t2: %s, diff: %s",
+		c.Clock1Input.Text,
+		c.Clock2Input.Text,
+		c.DifferenceInput.Text,
+	)
+
 	err := c.InternalCheck()
 	if err != nil {
 		dialog.ShowError(err, c.Window)
