@@ -1,6 +1,9 @@
 package model
 
 import (
+	"errors"
+	"regexp"
+	"strconv"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -8,20 +11,26 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+var (
+	ErrInvalidClock1Time = errors.New("clock 1 time is wrong")
+	ErrInvalidClock2Time = errors.New("clock 2 time is wrong")
+	ErrInvalidDifference = errors.New("difference is wrong")
+)
+
 type Challenge struct {
 	widget.BaseWidget
 	Clock1      fyne.CanvasObject
 	Clock1Time  time.Time
 	Clock1Input *widget.Entry
-	Clock1Guess string
+	Clock1Guess time.Time
 
 	Clock2      fyne.CanvasObject
 	Clock2Time  time.Time
 	Clock2Input *widget.Entry
-	Clock2Guess string
+	Clock2Guess time.Time
 
 	DifferenceInput *widget.Entry
-	DifferenceGuess string
+	DifferenceGuess time.Time
 
 	SubmitButton *widget.Button
 	Window       fyne.Window
@@ -73,5 +82,68 @@ func CreateClock(clockTime time.Time) fyne.CanvasObject {
 }
 
 func (c *Challenge) Check() {
-	dialog.ShowInformation("Checking", "Checking your answers", c.Window)
+	err := c.InternalCheck()
+	if err != nil {
+		dialog.ShowError(err, c.Window)
+	} else {
+		dialog.ShowInformation("Correct!", "Great Job!", c.Window)
+	}
+}
+
+func (c *Challenge) InternalCheck() error {
+	var err error
+
+	c.Clock1Guess, err = parseInputTime(c.Clock1Input.Text)
+	if err != nil {
+		return err
+	}
+
+	c.Clock2Guess, err = parseInputTime(c.Clock2Input.Text)
+	if err != nil {
+		return err
+	}
+
+	c.DifferenceGuess, err = parseInputTime(c.DifferenceInput.Text)
+	if err != nil {
+		return err
+	}
+
+	// TODO: Compare the times here.
+
+	return nil
+}
+
+var (
+	timeRegex      = regexp.MustCompile(`^(?P<Hour>[0-9]+):(?P<Minute>[0-9]+)`)
+	ErrInvalidTime = errors.New("invalid time format, try hh:mm")
+)
+
+func parseInputTime(input string) (time.Time, error) {
+	t := time.Time{}
+
+	if !timeRegex.MatchString(input) {
+		return t, ErrInvalidTime
+	}
+
+	values := timeRegex.FindStringSubmatch(input)
+
+	if len(values) != 3 {
+		return t, ErrInvalidTime
+	}
+
+	hourInt, err := strconv.Atoi(values[1])
+	if err != nil {
+		return t, err
+	}
+
+	t = t.Add(time.Hour * time.Duration(hourInt))
+
+	minInt, err := strconv.Atoi(values[2])
+	if err != nil {
+		return t, err
+	}
+
+	t = t.Add(time.Minute * time.Duration(minInt))
+
+	return t, nil
 }
