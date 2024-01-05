@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"math/rand"
 	"regexp"
 	"strconv"
 	"time"
@@ -42,12 +43,30 @@ func NewChallenge(win fyne.Window) *Challenge {
 		Window: win,
 	}
 
-	t1 := time.Date(1, 1, 1, 11, 00, 00, 00, time.UTC)
-	t2 := time.Date(1, 1, 1, 12, 30, 00, 00, time.UTC)
+	t1Hour, t1Min, t2Hour, t2Min := newRandomTimes()
+
+	t1 := time.Date(1, 1, 1, t1Hour, t1Min, 00, 00, time.UTC)
+	t2 := time.Date(1, 1, 1, t2Hour, t2Min, 00, 00, time.UTC)
+
+	if t2.Before(t1) {
+		diff := t1.Sub(t2)
+
+		t2 = t2.Add(diff)
+		t2 = t2.Add(diff)
+	}
 
 	c.New(t1, t2)
 
 	return &c
+}
+
+func newRandomTimes() (t1Hour, t1Min, t2Hour, t2Min int) {
+	t1Hour = rand.Intn(25)    // gets a random integer between 0 and 24
+	t2Hour = rand.Intn(25)    // gets a random integer between 0 and 24
+	t1Min = rand.Intn(13) * 5 // gets a random integer between 0 and 60, on nearest 5
+	t2Min = rand.Intn(13) * 5 // gets a random integer between 0 and 60, on nearest 5
+
+	return
 }
 
 func (c *Challenge) New(time1, time2 time.Time) {
