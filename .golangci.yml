@@ -1,0 +1,56 @@
+run:
+  # default concurrency is a available CPU number
+  concurrency: 4
+  # timeout for analysis, e.g. 30s, 5m, default is 1m
+  timeout: 10m
+
+linters-settings:
+  errcheck:
+    # path to a file containing a list of functions to exclude from checking
+    # see https://github.com/kisielk/errcheck#excluding-functions for details
+    exclude: .errcheck-exclude.txt
+  golint:
+    min-confidence: 0
+
+linters:
+  enable:
+    - asciicheck
+    - bodyclose
+    - bodyclose
+    - durationcheck
+    - errcheck
+    - errorlint
+    - exportloopref
+    - funlen
+    - goconst
+    - gocritic
+    - gofmt
+    - goheader
+    - goimports
+    - goimports
+    - gosec
+    - gosimple
+    - importas
+    - ineffassign
+    - makezero
+    - misspell
+    - nakedret
+    - nilerr
+    - nolintlint
+    - prealloc
+    - predeclared
+    - revive
+    - rowserrcheck
+    - staticcheck
+    - stylecheck
+    - typecheck
+    - unparam
+    - unused
+    - whitespace
+    - wsl
+issues:
+  # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
+  max-issues-per-linter: 0
+
+  # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
+  max-same-issues: 0
