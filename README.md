@@ -7,7 +7,10 @@ calculate the difference in hours and minutes between two analog clocks.
 
 ## To Do List
 
+- write better tests
+- refactor as it makes sense to do so
 - fix layout to look nicer
+- fix dialog box to be more consistent / good
  
 ## Fix macOS quarantine?
 

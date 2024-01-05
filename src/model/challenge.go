@@ -90,15 +90,15 @@ func (c *Challenge) New(time1, time2 time.Time) {
 	c.Difference = time2.Sub(time1)
 
 	c.Clock1Input = widget.NewEntry()
-	c.Clock1Input.SetPlaceHolder("Enter Time")
+	c.Clock1Input.SetPlaceHolder("Enter Time (hh:mm)")
 
 	c.Clock2Input = widget.NewEntry()
-	c.Clock2Input.SetPlaceHolder("Enter Time")
+	c.Clock2Input.SetPlaceHolder("Enter Time (hh:mm)")
 
 	c.DifferenceInput = widget.NewEntry()
-	c.DifferenceInput.SetPlaceHolder("Enter difference")
+	c.DifferenceInput.SetPlaceHolder("Enter difference (hh:mm)")
 
-	c.SubmitButton = widget.NewButton("Check", c.Check)
+	c.SubmitButton = widget.NewButton("Check Answer", c.Check)
 
 	log.Printf("T1: %02d:%02d, T2: %02d:%02d, Diff: %v",
 		time1.Hour(), time1.Minute(),

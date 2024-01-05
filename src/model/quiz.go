@@ -49,7 +49,8 @@ func (q *Quiz) NewChallenge() {
 		q.Challenge.Clock1, q.Challenge.Clock2,
 		q.Challenge.Clock1Input, q.Challenge.Clock2Input,
 		q.Challenge.DifferenceInput, q.Challenge.SubmitButton,
-		q.NewChallengeButton, q.Scoreboard.Label,
+		q.Scoreboard.Label,
+		q.NewChallengeButton,
 	)
 
 	q.Window.SetContent(content)
