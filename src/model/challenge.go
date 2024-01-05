@@ -51,16 +51,20 @@ func NewChallenge(win fyne.Window) *Challenge {
 	t1 := time.Date(1, 1, 1, t1Hour, t1Min, 00, 00, time.UTC)
 	t2 := time.Date(1, 1, 1, t2Hour, t2Min, 00, 00, time.UTC)
 
-	if t2.Before(t1) {
-		diff := t1.Sub(t2)
-
-		t2 = t2.Add(diff)
-		t2 = t2.Add(diff)
-	}
+	t1, t2 = fixupTimes(t1, t2)
 
 	c.New(t1, t2)
 
 	return &c
+}
+
+// fixupTimes ensures that our times make for good guesses
+func fixupTimes(t1, t2 time.Time) (time.Time, time.Time) {
+	if t2.Before(t1) {
+		t1, t2 = t2, t1
+	}
+
+	return t1, t2
 }
 
 func newRandomTimes() (int, int, int, int) {
@@ -96,7 +100,7 @@ func (c *Challenge) New(time1, time2 time.Time) {
 
 	c.SubmitButton = widget.NewButton("Check", c.Check)
 
-	log.Printf("T1: %v, T2: %v", time1, time2)
+	log.Printf("T1: %v, T2: %v, Diff: %v", time1, time2, time2.Sub(time1))
 }
 
 func CreateClock(clockTime time.Time) fyne.CanvasObject {
@@ -207,6 +211,8 @@ func fixupClockTime(guess, actual time.Time) time.Time {
 	if guess == actual {
 		return guess
 	} else if guess.Add(time.Hour*12) == actual {
+		return actual
+	} else if guess.Add(time.Hour*-12) == actual {
 		return actual
 	}
 

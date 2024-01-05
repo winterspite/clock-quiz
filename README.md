@@ -9,8 +9,6 @@ in hours and minutes between two analog clocks.
 - scoreboard
 - refresh / new challenge feature
     - clocks don't update
-- fix times again so we don't wrap over the day
-- allow 12 when time is 00
  
 ## Fix macOS quarantine?
 
