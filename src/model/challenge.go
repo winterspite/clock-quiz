@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -150,13 +152,41 @@ func (c *Challenge) Check() {
 
 	c.UpdateScore(score)
 
+	content := c.getDialogContents(score, err)
+
 	if err != nil {
-		dialog.ShowError(err, c.Window)
+		dialog.ShowCustom("Incorrect", "OK", content, c.Window)
 	} else {
-		dialog.ShowInformation("Correct!", "Great Job!", c.Window)
+		dialog.ShowCustom("Correct!", "Great Job!", content, c.Window)
 
 		c.Quiz.NewChallenge()
 	}
+}
+
+func (c *Challenge) getDialogContents(score Score, err error) *fyne.Container {
+	c1Label := widget.NewLabel("Clock 1 Guess")
+	c1Text := widget.NewLabel(c.Clock1InputString)
+	c2Label := widget.NewLabel("Clock 2 Guess")
+	c2Text := widget.NewLabel(c.Clock2InputString)
+	diffLabel := widget.NewLabel("Difference Guess")
+	diffText := widget.NewLabel(c.DifferenceInputString)
+	resultLabel := widget.NewLabel("Result")
+
+	result := string(score)
+	if err != nil {
+		result += " " + err.Error()
+	}
+
+	resultString := widget.NewLabel(result)
+
+	dContainer := container.New(layout.NewFormLayout(),
+		c1Label, c1Text,
+		c2Label, c2Text,
+		diffLabel, diffText,
+		resultLabel, resultString,
+	)
+
+	return dContainer
 }
 
 type Score string

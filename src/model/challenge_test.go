@@ -1,9 +1,16 @@
 package model
 
 import (
-	"github.com/stretchr/testify/suite"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/suite"
+)
+
+const (
+	Time1h00m = "1:00"
+	Time2h00m = "2:00"
+	Time3h00m = "3:00"
 )
 
 type InternalCheckSuite struct {
@@ -36,9 +43,9 @@ func (suite *InternalCheckSuite) TestInvalidInput() {
 }
 
 func (suite *InternalCheckSuite) TestValidTimesNoClocks() {
-	suite.Challenge.Clock1InputString = "1:00"
-	suite.Challenge.Clock2InputString = "2:00"
-	suite.Challenge.DifferenceInputString = "2:00"
+	suite.Challenge.Clock1InputString = Time1h00m
+	suite.Challenge.Clock2InputString = Time2h00m
+	suite.Challenge.DifferenceInputString = Time2h00m
 
 	score, err := suite.Challenge.InternalCheck()
 
@@ -48,10 +55,10 @@ func (suite *InternalCheckSuite) TestValidTimesNoClocks() {
 
 func (suite *InternalCheckSuite) TestValidTimesForClocksWrongDifference() {
 	suite.Challenge.Clock1Time = time.Date(1, 1, 1, 1, 00, 00, 00, time.UTC)
-	suite.Challenge.Clock1InputString = "1:00"
+	suite.Challenge.Clock1InputString = Time1h00m
 	suite.Challenge.Clock2Time = time.Date(1, 1, 1, 2, 00, 00, 00, time.UTC)
-	suite.Challenge.Clock2InputString = "2:00"
-	suite.Challenge.DifferenceInputString = "2:00"
+	suite.Challenge.Clock2InputString = Time2h00m
+	suite.Challenge.DifferenceInputString = Time2h00m
 	suite.Challenge.Difference = suite.Challenge.Clock2Time.Sub(suite.Challenge.Clock1Time)
 
 	score, err := suite.Challenge.InternalCheck()
@@ -62,10 +69,10 @@ func (suite *InternalCheckSuite) TestValidTimesForClocksWrongDifference() {
 
 func (suite *InternalCheckSuite) TestValidTimesForClocksCorrectDifference() {
 	suite.Challenge.Clock1Time = time.Date(1, 1, 1, 1, 00, 00, 00, time.UTC)
-	suite.Challenge.Clock1InputString = "1:00"
+	suite.Challenge.Clock1InputString = Time1h00m
 	suite.Challenge.Clock2Time = time.Date(1, 1, 1, 2, 00, 00, 00, time.UTC)
-	suite.Challenge.Clock2InputString = "2:00"
-	suite.Challenge.DifferenceInputString = "1:00"
+	suite.Challenge.Clock2InputString = Time2h00m
+	suite.Challenge.DifferenceInputString = Time1h00m
 	suite.Challenge.Difference = suite.Challenge.Clock2Time.Sub(suite.Challenge.Clock1Time)
 
 	score, err := suite.Challenge.InternalCheck()
@@ -76,10 +83,10 @@ func (suite *InternalCheckSuite) TestValidTimesForClocksCorrectDifference() {
 
 func (suite *InternalCheckSuite) Test12HourDifferences() {
 	suite.Challenge.Clock1Time = time.Date(1, 1, 1, 1, 00, 00, 00, time.UTC)
-	suite.Challenge.Clock1InputString = "1:00"
+	suite.Challenge.Clock1InputString = Time1h00m
 	suite.Challenge.Clock2Time = time.Date(1, 1, 1, 15, 00, 00, 00, time.UTC)
-	suite.Challenge.Clock2InputString = "3:00"
-	suite.Challenge.DifferenceInputString = "2:00"
+	suite.Challenge.Clock2InputString = Time3h00m
+	suite.Challenge.DifferenceInputString = Time2h00m
 	suite.Challenge.Difference = suite.Challenge.Clock2Time.Sub(suite.Challenge.Clock1Time)
 
 	/*
