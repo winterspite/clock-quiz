@@ -1,7 +1,7 @@
 # clock-quiz
 
-What is this? It's a basic Go app to learn fyne and to teach my daughter to calculate the difference
-in hours and minutes between two analog clocks. 
+What is this? It's a basic Go app to learn the [fyne](https://fyne.io/) toolkit and to teach my daughter to 
+calculate the difference in hours and minutes between two analog clocks. 
 
 ![docs/demo.png](docs/demo.png)
 
