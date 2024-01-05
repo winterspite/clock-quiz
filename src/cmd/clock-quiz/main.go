@@ -15,7 +15,7 @@ func main() {
 	quiz := model.NewChallenge(w)
 
 	content := container.New(
-		layout.NewGridLayout(2),
+		layout.NewFormLayout(),
 		quiz.Clock1, quiz.Clock2,
 		quiz.Clock1Input, quiz.Clock2Input,
 		quiz.DifferenceInput, quiz.SubmitButton,

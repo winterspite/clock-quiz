@@ -7,3 +7,4 @@
 - fix layout
 - scoreboard
 - refresh / new challenge feature
+- fix times again so we don't wrap over the day

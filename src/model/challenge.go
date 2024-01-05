@@ -157,6 +157,12 @@ func (c *Challenge) InternalCheck() error {
 	}
 
 	if c.DifferenceGuess != c.Difference {
+		if c.Difference > (time.Hour * 12) { // 24hr check
+			if c.DifferenceGuess == (c.Difference - (time.Hour * 12)) {
+				return nil
+			}
+		}
+
 		return ErrInvalidDifference
 	}
 
