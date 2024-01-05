@@ -30,7 +30,8 @@ type Challenge struct {
 	Clock2Guess time.Time
 
 	DifferenceInput *widget.Entry
-	DifferenceGuess time.Time
+	DifferenceGuess time.Duration
+	Difference      time.Duration
 
 	SubmitButton *widget.Button
 	Window       fyne.Window
@@ -40,14 +41,23 @@ func NewChallenge(win fyne.Window) *Challenge {
 	c := Challenge{
 		Window: win,
 	}
-	c.New()
+
+	t1 := time.Date(1, 1, 1, 11, 00, 00, 00, time.UTC)
+	t2 := time.Date(1, 1, 1, 12, 30, 00, 00, time.UTC)
+
+	c.New(t1, t2)
 
 	return &c
 }
 
-func (c *Challenge) New() {
-	c.Clock1 = CreateClock(time.Date(2020, 01, 01, 11, 00, 00, 00, time.UTC))
-	c.Clock2 = CreateClock(time.Date(2020, 01, 01, 12, 30, 00, 00, time.UTC))
+func (c *Challenge) New(time1, time2 time.Time) {
+	c.Clock1Time = time1
+	c.Clock1 = CreateClock(time1)
+
+	c.Clock2Time = time2
+	c.Clock2 = CreateClock(time2)
+
+	c.Difference = time2.Sub(time1)
 
 	c.Clock1Input = widget.NewEntry()
 	c.Clock1Input.SetPlaceHolder("Enter Time")
@@ -103,20 +113,57 @@ func (c *Challenge) InternalCheck() error {
 		return err
 	}
 
-	c.DifferenceGuess, err = parseInputTime(c.DifferenceInput.Text)
+	c.DifferenceGuess, err = parseInputDuration(c.DifferenceInput.Text)
 	if err != nil {
 		return err
 	}
 
-	// TODO: Compare the times here.
+	if c.Clock1Time != c.Clock1Guess {
+		return ErrInvalidClock1Time
+	}
+
+	if c.Clock2Time != c.Clock2Guess {
+		return ErrInvalidClock2Time
+	}
+
+	if c.DifferenceGuess != c.Difference {
+		return ErrInvalidDifference
+	}
 
 	return nil
 }
 
 var (
-	timeRegex      = regexp.MustCompile(`^(?P<Hour>[0-9]+):(?P<Minute>[0-9]+)`)
+	timeRegex      = regexp.MustCompile(`^(?P<Hour>[0-9]{1,2}):(?P<Minute>[0-9]{2})`)
 	ErrInvalidTime = errors.New("invalid time format, try hh:mm")
 )
+
+func parseInputDuration(input string) (time.Duration, error) {
+	if !timeRegex.MatchString(input) {
+		return 0, ErrInvalidTime
+	}
+
+	values := timeRegex.FindStringSubmatch(input)
+
+	if len(values) != 3 {
+		return 0, ErrInvalidTime
+	}
+
+	hourInt, err := strconv.Atoi(values[1])
+	if err != nil {
+		return 0, err
+	}
+
+	minInt, err := strconv.Atoi(values[2])
+	if err != nil {
+		return 0, err
+	}
+
+	d := (time.Hour * time.Duration(hourInt)) +
+		(time.Minute * time.Duration(minInt))
+
+	return d, nil
+}
 
 func parseInputTime(input string) (time.Time, error) {
 	t := time.Time{}
