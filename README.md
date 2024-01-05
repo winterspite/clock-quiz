@@ -11,6 +11,7 @@ calculate the difference in hours and minutes between two analog clocks.
 - refactor as it makes sense to do so
 - fix layout to look nicer
 - fix dialog box to be more consistent / good
+- update `parseInputTime` to also support `0h15m` format
  
 ## Fix macOS quarantine?
 
