@@ -18,6 +18,7 @@ type ClockLayout struct {
 	SecondDot *canvas.Circle
 	Face      *canvas.Circle
 	Canvas    fyne.CanvasObject
+	Time      time.Time
 }
 
 func (c *ClockLayout) Rotate(hand *canvas.Line, middle fyne.Position, facePosition float64, offset float32, length float32) {
@@ -54,10 +55,10 @@ func (c *ClockLayout) Layout(_ []fyne.CanvasObject, size fyne.Size) {
 	c.Face.Move(topLeft)
 
 	c.Hour.StrokeWidth = stroke
-	c.Rotate(c.Hour, middle, float64((time.Now().Hour()%12)*5)+(float64(time.Now().Minute())/12), dotRadius, radius/2)
+	c.Rotate(c.Hour, middle, float64((c.Time.Hour()%12)*5)+(float64(c.Time.Minute())/12), dotRadius, radius/2)
 
 	c.Minute.StrokeWidth = midStroke
-	c.Rotate(c.Minute, middle, float64(time.Now().Minute()), dotRadius, radius*0.9)
+	c.Rotate(c.Minute, middle, float64(c.Time.Minute()), dotRadius, radius*0.9)
 
 	c.HourDot.StrokeWidth = stroke
 	c.HourDot.Resize(fyne.NewSize(dotRadius*2, dotRadius*2))
@@ -80,20 +81,20 @@ func (c *ClockLayout) Render() *fyne.Container {
 	c.Hour = &canvas.Line{StrokeColor: theme.ForegroundColor(), StrokeWidth: 5}
 	c.Minute = &canvas.Line{StrokeColor: theme.ForegroundColor(), StrokeWidth: 3}
 
-	container := container.NewWithoutLayout(c.HourDot)
+	clockContainer := container.NewWithoutLayout(c.HourDot)
 
 	for idx := range c.Pips {
 		pip := &canvas.Line{StrokeColor: theme.DisabledColor(), StrokeWidth: 1}
-		container.Add(pip)
+		clockContainer.Add(pip)
 		c.Pips[idx] = pip
 	}
 
-	container.Objects = append(container.Objects, c.Face, c.Hour, c.Minute)
-	container.Layout = c
+	clockContainer.Objects = append(clockContainer.Objects, c.Face, c.Hour, c.Minute)
+	clockContainer.Layout = c
 
-	c.Canvas = container
+	c.Canvas = clockContainer
 
-	return container
+	return clockContainer
 }
 
 func (c *ClockLayout) ApplyTheme(_ fyne.Settings) {
