@@ -1,8 +1,10 @@
 package model
 
 import (
+	"crypto/rand"
 	"errors"
-	"math/rand"
+	"log"
+	"math/big"
 	"regexp"
 	"strconv"
 	"time"
@@ -60,13 +62,17 @@ func NewChallenge(win fyne.Window) *Challenge {
 	return &c
 }
 
-func newRandomTimes() (t1Hour, t1Min, t2Hour, t2Min int) {
-	t1Hour = rand.Intn(25)    // gets a random integer between 0 and 24
-	t2Hour = rand.Intn(25)    // gets a random integer between 0 and 24
-	t1Min = rand.Intn(13) * 5 // gets a random integer between 0 and 60, on nearest 5
-	t2Min = rand.Intn(13) * 5 // gets a random integer between 0 and 60, on nearest 5
+func newRandomTimes() (int, int, int, int) {
+	t1Hour, _ := rand.Int(rand.Reader, big.NewInt(25)) // gets a random integer between 0 and 24
+	t2Hour, _ := rand.Int(rand.Reader, big.NewInt(25)) // gets a random integer between 0 and 24
+	t1Min, _ := rand.Int(rand.Reader, big.NewInt(13))  // gets a random integer between 0 and 60, on nearest 5
+	t2Min, _ := rand.Int(rand.Reader, big.NewInt(13))  // gets a random integer between 0 and 60, on nearest 5
 
-	return
+	t1Min = t1Min.Mul(t1Min, big.NewInt(5))
+	t2Min = t2Min.Mul(t2Min, big.NewInt(5))
+
+	return int(t1Hour.Int64()), int(t1Min.Int64()),
+		int(t2Hour.Int64()), int(t2Min.Int64())
 }
 
 func (c *Challenge) New(time1, time2 time.Time) {
@@ -88,6 +94,8 @@ func (c *Challenge) New(time1, time2 time.Time) {
 	c.DifferenceInput.SetPlaceHolder("Enter difference")
 
 	c.SubmitButton = widget.NewButton("Check", c.Check)
+
+	log.Printf("T1: %v, T2: %v", time1, time2)
 }
 
 func CreateClock(clockTime time.Time) fyne.CanvasObject {
@@ -137,6 +145,9 @@ func (c *Challenge) InternalCheck() error {
 		return err
 	}
 
+	c.Clock1Guess = fixupClockTime(c.Clock1Guess, c.Clock1Time)
+	c.Clock2Guess = fixupClockTime(c.Clock2Guess, c.Clock2Time)
+
 	if c.Clock1Time != c.Clock1Guess {
 		return ErrInvalidClock1Time
 	}
@@ -150,6 +161,16 @@ func (c *Challenge) InternalCheck() error {
 	}
 
 	return nil
+}
+
+func fixupClockTime(guess, actual time.Time) time.Time {
+	if guess == actual {
+		return guess
+	} else if guess.Add(time.Hour*12) == actual {
+		return actual
+	}
+
+	return guess
 }
 
 var (
