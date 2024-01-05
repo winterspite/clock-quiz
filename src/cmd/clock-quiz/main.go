@@ -19,7 +19,7 @@ func main() {
 		quiz.Challenge.Clock1, quiz.Challenge.Clock2,
 		quiz.Challenge.Clock1Input, quiz.Challenge.Clock2Input,
 		quiz.Challenge.DifferenceInput, quiz.Challenge.SubmitButton,
-		quiz.Scoreboard.Label, quiz.Scoreboard.Label,
+		quiz.NewChallengeButton, quiz.Scoreboard.Label,
 	)
 
 	w.SetContent(content)

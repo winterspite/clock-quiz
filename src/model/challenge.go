@@ -125,6 +125,8 @@ func (c *Challenge) Check() {
 		dialog.ShowError(err, c.Window)
 	} else {
 		dialog.ShowInformation("Correct!", "Great Job!", c.Window)
+
+		c.Quiz.NewChallenge()
 	}
 }
 
