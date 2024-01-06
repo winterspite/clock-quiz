@@ -1,6 +1,6 @@
 # clock-quiz
 
-[![Go Coverage](https://github.com/winterspite/clock-quiz/wiki/coverage.svg)](https://raw.githack.com/wiki/winterspite/clock-quiz/coverage.html)
+![go coverage](https://github.com/winterspite/clock-quiz/wiki/coverage.svg)
 
 What is this? It's a basic Go app to learn the [fyne](https://fyne.io/) toolkit and to teach my daughter to 
 calculate the difference in hours and minutes between two analog clocks. 
