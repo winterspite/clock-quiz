@@ -13,7 +13,7 @@ calculate the difference in hours and minutes between two analog clocks.
  
 ## Fix macOS quarantine?
 
-`sudo xattr -r -d com.apple.quarantine MyApp.app`
+`sudo xattr -r -d com.apple.quarantine ClockQuiz.app`
 
 ## Credits
 
